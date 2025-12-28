@@ -82,3 +82,77 @@ If the variable is not set, the module falls back to:
 ````
 C:\SimpleWAF.txt
 ````
+
+## IIS Substatus Codes
+
+| Substatus | Meaning |
+|----------:|--------|
+| 400.1001 | URL too long |
+| 400.1002 | Raw non-ASCII character |
+| 400.1003 | Colon in URL path |
+| 400.1004 | Invalid percent encoding |
+| 400.1005 | Direct IP access (host header) |
+
+These appear in IIS logs and Failed Request Tracing.
+
+---
+
+## Performance considerations
+
+- One pass over the URL path
+- No heap allocations per request (except logging)
+- No regex
+- No parsing beyond basic byte inspection
+
+In practice, overhead is negligible compared to ASP.NET request startup.
+
+---
+
+## Compatibility
+
+- IIS 10+
+- Windows Server 2016+
+- Integrated pipeline
+- All HTTP verbs (GET, POST, PUT, DELETE, etc.)
+
+The module runs before routing and handlers.
+
+---
+
+## Security considerations
+
+This module intentionally blocks:
+
+- malformed requests
+- ambiguous encodings
+- non-standard URL forms
+
+It may block:
+
+- certain edge-case URLs
+- poorly-behaved clients
+- requests without a proper Host header
+
+This is by design.
+
+If your application legitimately requires Unicode paths or IP-based access,  
+this module is probably not appropriate without modification.
+
+---
+
+## License
+
+MIT License
+
+See `LICENSE` for details.
+
+---
+
+## Disclaimer
+
+This software is provided **as-is**, without warranty of any kind.
+
+Use at your own risk.
+
+If you deploy this in production, you are responsible for understanding  
+what it blocks and why.
