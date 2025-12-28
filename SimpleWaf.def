@@ -1,0 +1,3 @@
+LIBRARY SimpleWaf
+EXPORTS
+    RegisterModule

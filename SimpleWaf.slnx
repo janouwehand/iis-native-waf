@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="SimpleWaf.vcxproj" Id="d10d408b-ad80-4bd8-acd0-d41d2ade0578" />
+</Solution>
