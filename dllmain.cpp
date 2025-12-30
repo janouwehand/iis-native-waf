@@ -16,7 +16,7 @@ enum WafSubstatus : USHORT
 	SUBSTATUS_IP_HOST = 1005
 };
 
-static char g_LogPath[MAX_PATH] = "C:\\Temp\\SimpleWAF.txt"; // fallback
+static char g_LogPath[MAX_PATH] = {};
 
 //
 // Logging
@@ -253,19 +253,45 @@ public:
 	}
 };
 
-static void InitLogPath()
+static void InitLogPathFromModule()
 {
-	char buf[MAX_PATH];
-	DWORD len = GetEnvironmentVariableA(
-		"SIMPLE_WAF_LOG_PATH",
-		buf,
-		sizeof(buf)
+	char modulePath[MAX_PATH] = {};
+
+	HMODULE hModule = nullptr;
+
+	// Get handle of THIS DLL
+	if (!GetModuleHandleExA(
+		GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+		GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+		reinterpret_cast<LPCSTR>(&InitLogPathFromModule),
+		&hModule))
+	{
+		return;
+	}
+
+	DWORD len = GetModuleFileNameA(
+		hModule,
+		modulePath,
+		sizeof(modulePath)
 	);
 
-	if (len > 0 && len < sizeof(buf))
+	if (len == 0 || len >= sizeof(modulePath))
 	{
-		strcpy_s(g_LogPath, buf);
+		return;
 	}
+
+	// Strip filename -> directory
+	char* lastSlash = strrchr(modulePath, '\\');
+	if (!lastSlash)
+	{
+		return;
+	}
+
+	*(lastSlash + 1) = '\0'; // keep trailing slash
+
+	// Append logfile name
+	strcpy_s(g_LogPath, modulePath);
+	strcat_s(g_LogPath, "SimpleWaf.txt");
 }
 
 //
@@ -299,7 +325,7 @@ HRESULT __stdcall RegisterModule(
 	IHttpServer*
 )
 {
-	InitLogPath();
+	InitLogPathFromModule();
 
 	return pInfo->SetRequestNotifications(
 		new SimpleWafFactory(),
