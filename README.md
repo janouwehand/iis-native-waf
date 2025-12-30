@@ -23,11 +23,19 @@ Currently enforced rules:
 - Block requests made directly to an IP address instead of a hostname
 - Log all blocked requests with timestamp, reason, and remote IP
 
-Blocked requests receive:
+Blocked requests are handled as follows:
 
-- HTTP status: **400 Bad Request**
-- IIS substatus codes (`400.1001+`) for diagnostics
-- Zero-length response body
+- The TCP connection is immediately reset by the server
+- No HTTP response body is sent
+- No HTTP status code is received by the client
+- IIS internally records the intended status and substatus codes for diagnostics
+
+For blocked requests:
+
+- IIS logs record the status as **403 Forbidden**
+- IIS substatus codes (**403.1001+**) indicate the specific block reason
+- Substatus codes appear in IIS access logs and Failed Request Tracing
+- Clients receive a connection reset rather than a usable HTTP response
 
 ---
 
@@ -61,7 +69,7 @@ If you need those things, use a real WAF.
 
 ## Logging
 
-Blocked requests are logged to a configurable file.
+Blocked requests are logged to a file.
 
 Example log entry:
 
@@ -69,30 +77,15 @@ Example log entry:
 [2025-01-02 14:33:21] [IP 203.0.113.45] [COLON_IN_PATH] /foo:bar
 ````
 
-### Log path configuration
-
-The log path is configured via an environment variable:
-
-````
-cmd setx SIMPLE_WAF_LOG_PATH "C:\inetpub\VBS\WAF.txt" /M
-iisreset
-````
-
-If the variable is not set, the module falls back to:
-
-````
-C:\SimpleWAF.txt
-````
-
 ## IIS Substatus Codes
 
 | Substatus | Meaning |
 |----------:|--------|
-| 400.1001 | URL too long |
-| 400.1002 | Raw non-ASCII character |
-| 400.1003 | Colon in URL path |
-| 400.1004 | Invalid percent encoding |
-| 400.1005 | Direct IP access (host header) |
+| 403.1001 | URL too long |
+| 403.1002 | Raw non-ASCII character |
+| 403.1003 | Colon in URL path |
+| 403.1004 | Invalid percent encoding |
+| 403.1005 | Direct IP access (host header) |
 
 These appear in IIS logs and Failed Request Tracing.
 
