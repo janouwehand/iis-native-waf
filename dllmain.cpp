@@ -16,7 +16,7 @@ enum WafSubstatus : USHORT
 	SUBSTATUS_IP_HOST = 1005
 };
 
-static char g_LogPath[MAX_PATH] = "C:\\SimpleWAF.txt"; // fallback
+static char g_LogPath[MAX_PATH] = "C:\\Temp\\SimpleWAF.txt"; // fallback
 
 //
 // Logging
