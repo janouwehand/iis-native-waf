@@ -176,6 +176,9 @@ static REQUEST_NOTIFICATION_STATUS BlockRequest(
 {
 	LogBlockedUrl(req->pRawUrl, req->RawUrlLength, reason, ip, ipLen);
 
+	// Intentional delay to slow down scanners
+	Sleep(500);
+
 	auto* resp = ctx->GetResponse();
 
 	// Keep this for IIS/FREB visibility
