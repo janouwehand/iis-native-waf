@@ -25,7 +25,7 @@ Currently enforced rules:
 
 Blocked requests are handled as follows:
 
-- The TCP connection is immediately reset by the server
+- The TCP connection is reset by the server after an intentional delay of 500ms
 - No HTTP response body is sent
 - No HTTP status code is received by the client
 - IIS internally records the intended status and substatus codes for diagnostics
