@@ -37,6 +37,7 @@ Blocked requests receive:
 - IIS Request Filtering is too coarse for some cases
 - Application-level validation happens too late
 - Certain attacks should be rejected *before* routing, auth, or handlers
+- Avoid scanning bots from cluttering the event log
 
 This module is designed to be:
 - predictable
