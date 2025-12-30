@@ -177,8 +177,15 @@ static REQUEST_NOTIFICATION_STATUS BlockRequest(
 	LogBlockedUrl(req->pRawUrl, req->RawUrlLength, reason, ip, ipLen);
 
 	auto* resp = ctx->GetResponse();
-	resp->SetStatus(400, "Bad Request", substatus);
+
+	// Keep this for IIS/FREB visibility
+	resp->SetStatus(403, "Forbidden", substatus);
+
+	// No body
 	resp->SetHeader("Content-Length", "0", 1, TRUE);
+
+	// HARD DROP: send TCP RST. Goodbye bots.
+	resp->ResetConnection();
 
 	return RQ_NOTIFICATION_FINISH_REQUEST;
 }
