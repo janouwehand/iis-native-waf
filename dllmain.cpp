@@ -187,6 +187,8 @@ static REQUEST_NOTIFICATION_STATUS BlockRequest(
 	// No body
 	resp->SetHeader("Content-Length", "0", 1, TRUE);
 
+	ctx->SetRequestHandled();
+
 	// HARD DROP: send TCP RST. Goodbye bots.
 	resp->ResetConnection();
 
